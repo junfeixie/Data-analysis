@@ -1,0 +1,30 @@
+# 数据录入
+test1 <- read.csv(file = "双因素分析案例数据1.csv", header = TRUE, sep = ",")
+test2 <- read.csv(file = "双因素分析案例数据2.csv", header = TRUE, sep = ",")
+
+# 方差分析应用前提条件检验：
+# 1. 正态性检验
+group_test1 <- split(test1[,3], test1[,1])                         
+unlist(lapply(group_test1, function(x){                                
+  shapiro.test(x)$p.value                                           
+}))                                                             
+# 2. 方差齐性检验
+library(car)
+leveneTest(Yield~Strain, data = test1)
+
+# 例1: 不存在交互作用的双因素方差分析
+fit1 <- aov(Yield ~ Mode*Strain, data = test1)
+summary(fit1)
+# 主效应分析
+summary(aov(Yield~Mode + Strain, data = test1))
+# 两两比较
+TukeyHSD(fit1)
+
+# 例2:存在交互作用的双因素方差分析
+fit2 <- aov(Yield ~ Fertilizer*Soil, data = test2)
+summary(fit2)
+# 两两比较
+TukeyHSD(fit2)
+# HH包展示主效应和交互效应
+library(HH)
+interaction2wt(Yield ~ Fertilizer*Soil, data = test2)
